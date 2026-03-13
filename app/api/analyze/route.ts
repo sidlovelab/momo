@@ -3,6 +3,9 @@ import { scrapeInstagramProfile } from "@/lib/apify";
 import { analyzeProfile } from "@/lib/ai-analysis";
 import { Gender, AnalyzeError } from "@/lib/types";
 
+// Vercel Hobby plan max: 60s — 이미지 다운로드 + AI 분석에 시간이 필요
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
