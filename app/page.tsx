@@ -79,7 +79,10 @@ export default function Home() {
             난 어떻게 보일까?
           </span>
         </h1>
-        <p className="text-[#888] text-[0.95rem] leading-relaxed">
+        <p className="text-[#555] text-[0.95rem] leading-relaxed font-medium">
+          좋은 연애는 나를 아는 것부터 시작이죠 ☺️
+        </p>
+        <p className="text-[#AAA] text-[0.8rem] mt-1.5">
           인스타 아이디만 알려주면 모모가 분석해줄게요
         </p>
       </div>
@@ -147,9 +150,10 @@ export default function Home() {
         </button>
 
         {/* Notice */}
-        <p className="text-center text-xs text-[#BBB]">
-          공개 계정만 분석할 수 있어요
-        </p>
+        <div className="text-center text-xs text-[#BBB] space-y-0.5">
+          <p>· 공개 계정만 가능</p>
+          <p>· 최근 12개의 게시물 분석</p>
+        </div>
       </form>
     </main>
   );
