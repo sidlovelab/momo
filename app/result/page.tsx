@@ -85,7 +85,6 @@ function ResultContent() {
                 src={profile.profilePicUrl}
                 alt={profile.username}
                 className="w-16 h-16 rounded-full object-cover border-2 border-[#FFE4D6]"
-                crossOrigin="anonymous"
               />
             ) : (
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#FF6B6B] to-[#FFA07A] flex items-center justify-center text-white text-2xl">
@@ -169,7 +168,6 @@ function ResultContent() {
                   src={bestPhotoBase64}
                   alt="Best photo"
                   className="w-full aspect-square object-cover"
-                  crossOrigin="anonymous"
                 />
               </div>
             </div>

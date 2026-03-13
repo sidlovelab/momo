@@ -37,10 +37,10 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
 
     try {
       const { toBlob } = await import("html-to-image");
-      const blob = await toBlob(resultRef.current, {
-        backgroundColor: "#FFF5F0",
-        pixelRatio: 2,
-      });
+      const options = { backgroundColor: "#FFF5F0", pixelRatio: 2 };
+      // 첫 호출로 이미지 캐싱, 두 번째 호출로 실제 캡처
+      await toBlob(resultRef.current, options);
+      const blob = await toBlob(resultRef.current, options);
       if (!blob) throw new Error("Failed to generate image");
 
       const file = new File([blob], "momo-result.png", { type: "image/png" });
