@@ -38,11 +38,25 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
     setSaving(true);
 
     try {
+      // bg-clip-text text-transparent is not supported by html2canvas
+      // Temporarily swap to solid color for capture
+      const clipTextEls = resultRef.current.querySelectorAll<HTMLElement>(".bg-clip-text");
+      clipTextEls.forEach((el) => {
+        el.style.webkitTextFillColor = "#FF6B6B";
+        el.style.color = "#FF6B6B";
+      });
+
       const html2canvas = (await import("html2canvas-pro")).default;
       const canvas = await html2canvas(resultRef.current, {
         backgroundColor: "#FFF5F0",
         scale: 2,
         useCORS: true,
+      });
+
+      // Restore original styles
+      clipTextEls.forEach((el) => {
+        el.style.webkitTextFillColor = "";
+        el.style.color = "";
       });
 
       const dataUrl = canvas.toDataURL("image/png");
