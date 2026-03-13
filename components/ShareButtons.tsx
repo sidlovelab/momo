@@ -43,11 +43,29 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
         useCORS: true,
       });
 
-      const dataUrl = canvas.toDataURL("image/png");
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/png")
+      );
+      if (!blob) throw new Error("Failed to generate image");
+
+      // 모바일: Web Share API → 사진첩 저장 가능
+      const file = new File([blob], "momo-result.png", { type: "image/png" });
+      if (navigator.share && navigator.canShare?.({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] });
+          return; // 공유 성공 시 종료
+        } catch {
+          // 취소 또는 실패 → 다운로드로 폴백
+        }
+      }
+
+      // 데스크톱 또는 공유 실패 시: 파일 다운로드
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.download = "momo-result.png";
-      link.href = dataUrl;
+      link.href = url;
       link.click();
+      URL.revokeObjectURL(url);
     } catch (err) {
       console.error("Image save failed:", err);
       alert("이미지 저장에 실패했어요. 스크린샷을 이용해주세요!");
