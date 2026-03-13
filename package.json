@@ -11,7 +11,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",
     "@upstash/redis": "^1.37.0",
-    "html2canvas": "^1.4.1",
+    "html-to-image": "^1.11.13",
     "next": "16.1.6",
     "openai": "^6.27.0",
     "react": "19.2.3",

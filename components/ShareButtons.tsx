@@ -36,16 +36,14 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
     setSaving(true);
 
     try {
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(resultRef.current, {
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(resultRef.current, {
         backgroundColor: "#FFF5F0",
-        scale: 2,
-        useCORS: true,
-        allowTaint: true,
+        pixelRatio: 2,
       });
       const link = document.createElement("a");
       link.download = "momo-result.png";
-      link.href = canvas.toDataURL("image/png");
+      link.href = dataUrl;
       link.click();
     } catch (err) {
       console.error("Image save failed:", err);
