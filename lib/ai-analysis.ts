@@ -6,6 +6,31 @@ const anthropic = new Anthropic({
 });
 
 /**
+ * Remove unpaired Unicode surrogates that break JSON serialization.
+ * Instagram captions often contain these from emoji or special chars.
+ */
+function sanitizeString(str: string): string {
+  let result = "";
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i);
+    if (code >= 0xd800 && code <= 0xdbff) {
+      // High surrogate — only keep if followed by valid low surrogate
+      const next = str.charCodeAt(i + 1);
+      if (next >= 0xdc00 && next <= 0xdfff) {
+        result += str[i] + str[i + 1];
+        i++; // skip the low surrogate we just consumed
+      }
+      // else: lone high surrogate → skip
+    } else if (code >= 0xdc00 && code <= 0xdfff) {
+      // Lone low surrogate → skip
+    } else {
+      result += str[i];
+    }
+  }
+  return result;
+}
+
+/**
  * Download an image URL and convert to base64.
  * Returns null if the download fails.
  */
@@ -103,7 +128,7 @@ function buildUserPrompt(profile: InstagramProfile): string {
   const postsDescription = profile.recentPosts
     .map(
       (post, i) =>
-        `게시물 ${i + 1}: 캡션="${post.caption || "(없음)"}",  좋아요=${post.likesCount}, 댓글=${post.commentsCount}`
+        `게시물 ${i + 1}: 캡션="${sanitizeString(post.caption || "(없음)")}",  좋아요=${post.likesCount}, 댓글=${post.commentsCount}`
     )
     .join("\n");
 
@@ -125,7 +150,7 @@ function buildUserPrompt(profile: InstagramProfile): string {
 
   return `아래는 분석 대상의 인스타그램 프로필 데이터야:
 
-바이오: ${profile.bio || "(없음)"}
+바이오: ${sanitizeString(profile.bio || "(없음)")}
 팔로워: ${profile.followersCount.toLocaleString()}
 팔로잉: ${profile.followingCount.toLocaleString()}
 게시물 수: ${profile.postsCount}
@@ -196,7 +221,7 @@ export async function analyzeProfile(
   // Add post images with numbered labels + caption hint
   const posts = profile.recentPosts.slice(0, 12);
   for (let i = 0; i < postImageData.length; i++) {
-    const captionHint = posts[i]?.caption?.substring(0, 20) || "";
+    const captionHint = sanitizeString(posts[i]?.caption?.substring(0, 20) || "");
     contentBlocks.push({ type: "text", text: `[게시물 사진 ${i}] ${captionHint}` });
     contentBlocks.push({
       type: "image",
