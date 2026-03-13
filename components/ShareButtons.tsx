@@ -36,11 +36,16 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
     setSaving(true);
 
     try {
-      const { toBlob } = await import("html-to-image");
-      const options = { backgroundColor: "#FFF5F0", pixelRatio: 2 };
-      // 첫 호출로 이미지 캐싱, 두 번째 호출로 실제 캡처
-      await toBlob(resultRef.current, options);
-      const blob = await toBlob(resultRef.current, options);
+      const html2canvas = (await import("html2canvas-pro")).default;
+      const canvas = await html2canvas(resultRef.current, {
+        backgroundColor: "#FFF5F0",
+        scale: 2,
+        useCORS: true,
+      });
+
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob(resolve, "image/png")
+      );
       if (!blob) throw new Error("Failed to generate image");
 
       const file = new File([blob], "momo-result.png", { type: "image/png" });
