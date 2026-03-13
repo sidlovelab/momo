@@ -1,7 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://momo-two-delta.vercel.app"),
   title: "이성 눈에 너는 어떻게 보일까?",
   description:
     "인스타 아이디 하나면 끝. AI가 이성의 관점에서 솔직하게 분석해줄게.",
@@ -11,11 +18,14 @@ export const metadata: Metadata = {
       "인스타 아이디 하나면 끝. AI가 이성의 관점에서 솔직하게 분석해줄게.",
     type: "website",
     locale: "ko_KR",
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
+    images: [
+      {
+        url: "/momo.jpg",
+        width: 800,
+        height: 800,
+        alt: "AI 연애비서 모모",
+      },
+    ],
   },
 };
 
