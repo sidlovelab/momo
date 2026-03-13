@@ -23,7 +23,7 @@ export const metadata: Metadata = {
       {
         url: "/og-image.png",
         width: 1024,
-        height: 1536,
+        height: 636,
         alt: "AI 연애비서 모모",
       },
     ],
