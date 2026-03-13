@@ -32,7 +32,12 @@ function ResultContent() {
         return;
       }
       try {
-        setData(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setData(parsed);
+        // URL에 id 파라미터 추가 → 공유 링크가 제대로 동작하도록
+        if (parsed.resultId) {
+          router.replace(`/result?id=${parsed.resultId}`, { scroll: false });
+        }
       } catch {
         router.replace("/");
       }
