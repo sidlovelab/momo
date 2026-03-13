@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import LoadingScreen from "@/components/LoadingScreen";
+import { track } from "@/lib/mixpanel";
 
 export default function Home() {
   const router = useRouter();
@@ -10,6 +11,10 @@ export default function Home() {
   const [gender, setGender] = useState<"male" | "female" | "">("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    track("page_view", { page: "home" });
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -26,6 +31,7 @@ export default function Home() {
     }
 
     setLoading(true);
+    track("analysis_started", { username: cleanUsername, gender });
 
     try {
       const res = await fetch("/api/analyze", {
@@ -37,7 +43,9 @@ export default function Home() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "앗, 문제가 생겼어요. 다시 시도해주세요!");
+        const errorMsg = data.error || "앗, 문제가 생겼어요. 다시 시도해주세요!";
+        track("analysis_failed", { username: cleanUsername, error: errorMsg });
+        setError(errorMsg);
         setLoading(false);
         return;
       }
@@ -47,6 +55,7 @@ export default function Home() {
       const resultId = data.resultId;
       router.push(resultId ? `/result?id=${resultId}` : "/result");
     } catch {
+      track("analysis_failed", { username: cleanUsername, error: "network_error" });
       setError("인터넷 연결이 불안정해요. 확인 후 다시 시도해주세요!");
       setLoading(false);
     }

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { AnalyzeResponse } from "@/lib/types";
 import ResultCard from "@/components/ResultCard";
 import ShareButtons from "@/components/ShareButtons";
+import { track } from "@/lib/mixpanel";
 
 function ResultInner() {
   const router = useRouter();
@@ -21,7 +22,14 @@ function ResultInner() {
           if (!res.ok) throw new Error("not_found");
           return res.json();
         })
-        .then((result) => setData({ ...result, resultId }))
+        .then((result) => {
+          setData({ ...result, resultId });
+          track("result_viewed", {
+            source: "shared_link",
+            username: result.profile?.username,
+            probability: result.analysis?.blind_date_probability,
+          });
+        })
         .catch(() => setLoadError("결과를 찾을 수 없어요. 링크가 만료되었을 수 있어요."));
     } else {
       const stored = sessionStorage.getItem("analysisResult");
@@ -32,6 +40,12 @@ function ResultInner() {
       try {
         const parsed = JSON.parse(stored);
         setData(parsed);
+        track("result_viewed", {
+          source: "direct",
+          username: parsed.profile?.username,
+          probability: parsed.analysis?.blind_date_probability,
+          scores: parsed.analysis?.scores,
+        });
         if (parsed.resultId) {
           window.history.replaceState(null, "", `/result?id=${parsed.resultId}`);
         }
@@ -222,6 +236,7 @@ function ResultInner() {
         <ShareButtons resultRef={resultRef} />
         <button
           onClick={() => {
+            track("retry_clicked");
             sessionStorage.removeItem("analysisResult");
             router.push("/");
           }}

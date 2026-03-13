@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { track } from "@/lib/mixpanel";
 
 interface ShareButtonsProps {
   resultRef: React.RefObject<HTMLDivElement | null>;
@@ -13,6 +14,7 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
   const handleCopyLink = useCallback(async () => {
+    track("result_shared", { method: "copy_link" });
     try {
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
@@ -45,6 +47,7 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
 
       const dataUrl = canvas.toDataURL("image/png");
       setImageUrl(dataUrl);
+      track("image_saved");
     } catch (err) {
       console.error("Image save failed:", err);
       alert("이미지 저장에 실패했어요. 스크린샷을 이용해주세요!");
