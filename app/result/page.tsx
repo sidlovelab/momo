@@ -31,10 +31,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
           locale: "ko_KR",
           images: [
             {
-              url: "/momo.jpg",
-              width: 800,
-              height: 800,
-              alt: "AI 연애비서 모모",
+              url: `/api/og-image/${id}`,
+              width: 600,
+              height: 600,
+              alt: `@${username} 소개팅 이미지`,
             },
           ],
         },

@@ -21,9 +21,9 @@ export const metadata: Metadata = {
     locale: "ko_KR",
     images: [
       {
-        url: "/momo.jpg",
-        width: 800,
-        height: 800,
+        url: "/og-image.png",
+        width: 1024,
+        height: 1536,
         alt: "AI 연애비서 모모",
       },
     ],
