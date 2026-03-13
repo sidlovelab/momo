@@ -44,6 +44,7 @@ export interface AnalyzeResponse {
   profile: InstagramProfile;
   analysis: AnalysisResult;
   bestPhotoBase64?: string;
+  resultId?: string;
 }
 
 export interface AnalyzeError {

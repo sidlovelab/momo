@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { scrapeInstagramProfile } from "@/lib/apify";
 import { analyzeProfile } from "@/lib/ai-analysis";
+import { redis } from "@/lib/redis";
 import { Gender, AnalyzeError } from "@/lib/types";
 
 // Vercel Hobby plan max: 60s — 이미지 다운로드 + AI 분석에 시간이 필요
@@ -114,7 +115,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ profile, analysis, bestPhotoBase64 });
+    // Step 4: Save result to Redis for sharing
+    let resultId: string | undefined;
+    try {
+      resultId = crypto.randomUUID().slice(0, 8);
+      await redis.set(`result:${resultId}`, JSON.stringify({ profile, analysis, bestPhotoBase64 }), { ex: 604800 }); // 7일 TTL
+    } catch (err) {
+      console.error("Redis save error (non-fatal):", err);
+      // 저장 실패해도 분석 결과는 정상 반환
+    }
+
+    return NextResponse.json({ profile, analysis, bestPhotoBase64, resultId });
   } catch (err) {
     console.error("Unexpected error:", err);
     return NextResponse.json(

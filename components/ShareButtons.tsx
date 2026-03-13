@@ -13,14 +13,14 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
 
   const handleCopyLink = useCallback(async () => {
     try {
-      await navigator.clipboard.writeText(window.location.origin);
+      await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback for older browsers
       const input = document.createElement("input");
-      input.value = window.location.origin;
+      input.value = window.location.href;
       document.body.appendChild(input);
       input.select();
       document.execCommand("copy");

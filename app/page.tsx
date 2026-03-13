@@ -42,9 +42,10 @@ export default function Home() {
         return;
       }
 
-      // Store result in sessionStorage and navigate
+      // Store result in sessionStorage and navigate with resultId
       sessionStorage.setItem("analysisResult", JSON.stringify(data));
-      router.push("/result");
+      const resultId = data.resultId;
+      router.push(resultId ? `/result?id=${resultId}` : "/result");
     } catch {
       setError("인터넷 연결이 불안정해요. 확인 후 다시 시도해주세요!");
       setLoading(false);

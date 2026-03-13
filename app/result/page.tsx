@@ -1,28 +1,57 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { AnalyzeResponse } from "@/lib/types";
 import ResultCard from "@/components/ResultCard";
 import ShareButtons from "@/components/ShareButtons";
 
-export default function ResultPage() {
+function ResultContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resultId = searchParams.get("id");
   const [data, setData] = useState<AnalyzeResponse | null>(null);
+  const [loadError, setLoadError] = useState("");
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("analysisResult");
-    if (!stored) {
-      router.replace("/");
-      return;
+    if (resultId) {
+      // 공유 링크로 접속 → Redis에서 조회
+      fetch(`/api/result/${resultId}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("not_found");
+          return res.json();
+        })
+        .then((result) => setData({ ...result, resultId }))
+        .catch(() => setLoadError("결과를 찾을 수 없어요. 링크가 만료되었을 수 있어요."));
+    } else {
+      // 직접 분석 → sessionStorage에서 로드
+      const stored = sessionStorage.getItem("analysisResult");
+      if (!stored) {
+        router.replace("/");
+        return;
+      }
+      try {
+        setData(JSON.parse(stored));
+      } catch {
+        router.replace("/");
+      }
     }
-    try {
-      setData(JSON.parse(stored));
-    } catch {
-      router.replace("/");
-    }
-  }, [router]);
+  }, [resultId, router]);
+
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-[#FFF5F0] flex flex-col items-center justify-center px-5 gap-4">
+        <p className="text-[#2D2D2D] text-lg font-semibold">{loadError}</p>
+        <button
+          onClick={() => router.push("/")}
+          className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#FF6B6B] to-[#FFA07A] text-white font-semibold"
+        >
+          모모에게 분석 맡기기
+        </button>
+      </div>
+    );
+  }
 
   if (!data) {
     return (
@@ -221,5 +250,19 @@ export default function ResultPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function ResultPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#FFF5F0] flex items-center justify-center">
+          <div className="w-8 h-8 border-3 border-[#FF6B6B] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <ResultContent />
+    </Suspense>
   );
 }
