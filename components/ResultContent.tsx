@@ -219,8 +219,37 @@ function ResultInner() {
           </p>
         </ResultCard>
 
+        {analysis.recommended_places && analysis.recommended_places.length > 0 && (
+          <ResultCard delay={hasBestPhoto ? 1400 : 1200}>
+            <p className="text-xs text-[#2196F3] font-semibold mb-3 uppercase tracking-wider">
+              📍 여기서 만날 수 있어요
+            </p>
+            <ul className="space-y-2.5">
+              {analysis.recommended_places.map((place, i) => (
+                <li key={i} className="flex items-start gap-2.5">
+                  <span className="text-[#2196F3] mt-0.5 shrink-0 text-sm">●</span>
+                  <span className="text-[#2D2D2D] text-[0.95rem] leading-relaxed">
+                    {place}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </ResultCard>
+        )}
+
+        {analysis.meeting_scenario && (
+          <ResultCard delay={hasBestPhoto ? 1600 : 1400}>
+            <p className="text-xs text-[#E91E63] font-semibold mb-2 uppercase tracking-wider">
+              🎬 어떤 상황에서 만날지 모모가 상상해봤어요
+            </p>
+            <p className="text-[#2D2D2D] text-[0.95rem] leading-relaxed italic">
+              {analysis.meeting_scenario}
+            </p>
+          </ResultCard>
+        )}
+
         <ResultCard
-          delay={hasBestPhoto ? 1400 : 1200}
+          delay={hasBestPhoto ? 1800 : 1600}
           className="!bg-gradient-to-br !from-[#FF6B6B] !to-[#FFA07A]"
         >
           <p className="text-white/80 text-xs font-semibold mb-2 uppercase tracking-wider">

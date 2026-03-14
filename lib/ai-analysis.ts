@@ -92,6 +92,12 @@ function buildSystemPrompt(gender: Gender): string {
     "아쉬운 점 3"
   ],
   "attracted_type": "이런 타입이 당신에게 끌려요 (한 문장)",
+  "recommended_places": [
+    "이 타입을 만날 수 있는 구체적 장소/활동/앱 1",
+    "장소/활동/앱 2",
+    "장소/활동/앱 3"
+  ],
+  "meeting_scenario": "이런 상황에서 당신의 이상형을 만날 확률이 높아요 (구체적 시나리오 2-3문장)",
   "overall_comment": "소개팅 성공률을 올리려면 이것만 바꿔 (실행 가능한 전략 한 줄)"
 }
 
@@ -123,7 +129,18 @@ best_photo 선택 기준:
   - "다른 사진에선 ~한데, 이 사진에선 ~해서" 식으로 비교하면 더 좋아.
   - 1-2문장, 짧고 날카롭게.
   - 중요: reason은 반드시 선택한 post_index의 실제 사진 내용과 일치해야 해. 예시 문구를 복사하지 마.
-- 얼굴이 잘 보이는 인물 사진을 우선 선택해. 풍경/음식/사물만 있는 사진은 가능하면 피해.`;
+- 얼굴이 잘 보이는 인물 사진을 우선 선택해. 풍경/음식/사물만 있는 사진은 가능하면 피해.
+
+recommended_places 작성 기준:
+- attracted_type에 해당하는 사람들이 실제로 자주 가는 구체적인 장소, 활동, 앱을 3개 추천해.
+- 뻔한 추천 금지 ("카페", "헬스장" 같은 일반적인 것 말고).
+- 프로필에서 드러나는 관심사, 라이프스타일, 분위기를 기반으로 맞춤 추천해.
+- 한국 기준으로 작성. 구체적일수록 좋아. (예: "연남동 독립서점", "러닝크루 모임", "힌지 앱")
+
+meeting_scenario 작성 기준:
+- attracted_type과 자연스럽게 만날 수 있는 구체적인 상황을 2-3문장으로 서술해.
+- 현실적이고 생생한 시나리오로. 마치 소설의 한 장면처럼.
+- 이 사람의 매력이 자연스럽게 드러날 수 있는 상황으로 설정해.`;
 }
 
 function buildUserPrompt(profile: InstagramProfile): string {
@@ -247,7 +264,7 @@ export async function analyzeProfile(
 
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-20250514",
-    max_tokens: 1800,
+    max_tokens: 2200,
     temperature: 0.8,
     system: systemPrompt,
     messages: [

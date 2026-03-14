@@ -36,6 +36,8 @@ export interface AnalysisResult {
   attractive_points: string[];
   improvement_points: string[];
   attracted_type: string;
+  recommended_places: string[];
+  meeting_scenario: string;
   overall_comment: string;
   best_photo: BestPhoto;
 }
