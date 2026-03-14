@@ -114,9 +114,7 @@ scores (각 0~100):
   - 재력/라이프스타일 수준 (40%): 사진 속 여행지, 레스토랑, 패션 브랜드, 차, 주거 환경 등에서 추정되는 경제적 수준.
   - 팔로워/인맥 (20%): 팔로워 수와 참여율. 단, 일반인 기준으로 평가해 (1000명 이상이면 평균 이상).
 
-blind_date_probability (소개팅 받을 확률, 0~100%):
-- 위 3가지 점수를 종합해서 이성이 "소개팅 한번 해볼까?"라고 생각할 확률.
-- 솔직하게. 50% 이하도 가능. 100%는 거의 없어.
+blind_date_probability: 이 값은 무시해. 코드에서 자동 계산됨 (3개 점수 평균). 아무 숫자나 넣어도 돼.
 
 best_photo 선택 기준:
 - 게시물 사진 중에서 이성에게 가장 매력적으로 보일 사진 1장을 골라. post_index는 게시물 사진 번호 (0부터 시작, 프로필 사진 제외).
@@ -285,10 +283,16 @@ export async function analyzeProfile(
     !result.attractive_points ||
     !result.improvement_points ||
     !result.overall_comment ||
-    typeof result.blind_date_probability !== "number"
+    !result.scores
   ) {
     throw new Error("Invalid AI response structure");
   }
+
+  // Calculate blind_date_probability as average of 3 scores
+  const { sexual_attractiveness, intellectual_attractiveness, social_attractiveness } = result.scores;
+  result.blind_date_probability = Math.round(
+    (sexual_attractiveness + intellectual_attractiveness + social_attractiveness) / 3
+  );
 
   // Soft validation for best_photo (don't fail the entire analysis)
   if (
