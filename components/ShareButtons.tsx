@@ -39,11 +39,14 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
 
     try {
       // bg-clip-text text-transparent is not supported by html2canvas
-      // Temporarily swap to solid color for capture
+      // Temporarily swap gradient text to solid color + remove gradient background
       const clipTextEls = resultRef.current.querySelectorAll<HTMLElement>(".bg-clip-text");
       clipTextEls.forEach((el) => {
         el.style.webkitTextFillColor = "#FF6B6B";
         el.style.color = "#FF6B6B";
+        el.style.backgroundImage = "none";
+        el.style.webkitBackgroundClip = "border-box";
+        (el.style as unknown as Record<string, string>).backgroundClip = "border-box";
       });
 
       const html2canvas = (await import("html2canvas-pro")).default;
@@ -57,6 +60,9 @@ export default function ShareButtons({ resultRef }: ShareButtonsProps) {
       clipTextEls.forEach((el) => {
         el.style.webkitTextFillColor = "";
         el.style.color = "";
+        el.style.backgroundImage = "";
+        el.style.webkitBackgroundClip = "";
+        (el.style as unknown as Record<string, string>).backgroundClip = "";
       });
 
       const dataUrl = canvas.toDataURL("image/png");
