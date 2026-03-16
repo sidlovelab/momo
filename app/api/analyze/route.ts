@@ -3,6 +3,7 @@ import { scrapeInstagramProfile } from "@/lib/apify";
 import { analyzeProfile } from "@/lib/ai-analysis";
 import { redis } from "@/lib/redis";
 import { Gender, AnalyzeError } from "@/lib/types";
+import { notifySlack } from "@/lib/slack";
 
 // Vercel Hobby plan max: 60s — 이미지 다운로드 + AI 분석에 시간이 필요
 export const maxDuration = 60;
@@ -124,6 +125,9 @@ export async function POST(request: NextRequest) {
       console.error("Redis save error (non-fatal):", err);
       // 저장 실패해도 분석 결과는 정상 반환
     }
+
+    // Step 5: Slack notification (fire-and-forget)
+    notifySlack({ username: cleanUsername, gender, analysis });
 
     return NextResponse.json({ profile, analysis, bestPhotoBase64, resultId });
   } catch (err) {
